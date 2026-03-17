@@ -4,7 +4,6 @@ import { useNavigate } from "react-router-dom"
 function Admin() {
 
   const [appointments, setAppointments] = useState([])
-
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -22,26 +21,30 @@ function Admin() {
 
   const fetchAppointments = async (token) => {
 
-    const res = await fetch("http://localhost:5000/api/appointments", {
+    try {
 
-      headers: {
-        Authorization: token
-      }
+      const res = await fetch("https://dentist-booking-platform-wh8p.onrender.com/api/appointments", {
+        headers: {
+          Authorization: token
+        }
+      })
 
-    })
+      const data = await res.json()
 
-    const data = await res.json()
+      console.log("APPOINTMENTS:", data) // debug
 
-    setAppointments(data)
+      setAppointments(data)
+
+    } catch (error) {
+      console.log("ERROR:", error)
+    }
 
   }
+
   const logout = () => {
-
-  localStorage.removeItem("token")
-
-  window.location.href = "/admin-login"
-
-}
+    localStorage.removeItem("token")
+    window.location.href = "/admin-login"
+  }
 
   return (
 
@@ -50,19 +53,21 @@ function Admin() {
       <h1 style={{ marginBottom: "20px" }}>
         Admin Appointments
       </h1>
-<button
-  onClick={logout}
-  style={{
-    marginBottom: "20px",
-    padding: "8px 16px",
-    background: "red",
-    color: "white",
-    border: "none",
-    cursor: "pointer"
-  }}
->
-  Logout
-</button>
+
+      <button
+        onClick={logout}
+        style={{
+          marginBottom: "20px",
+          padding: "8px 16px",
+          background: "red",
+          color: "white",
+          border: "none",
+          cursor: "pointer"
+        }}
+      >
+        Logout
+      </button>
+
       <table
         border="1"
         style={{
@@ -72,18 +77,14 @@ function Admin() {
       >
 
         <thead>
-
           <tr>
-
             <th>Patient</th>
             <th>Age</th>
             <th>Gender</th>
             <th>Date</th>
             <th>Dentist</th>
             <th>Clinic</th>
-
           </tr>
-
         </thead>
 
         <tbody>
@@ -91,21 +92,12 @@ function Admin() {
           {appointments.map((a) => (
 
             <tr key={a._id}>
-
               <td>{a.patientName}</td>
-
               <td>{a.age}</td>
-
               <td>{a.gender}</td>
-
-              <td>
-                {new Date(a.appointmentDate).toLocaleDateString()}
-              </td>
-
+              <td>{new Date(a.appointmentDate).toLocaleDateString()}</td>
               <td>{a.dentistName}</td>
-
               <td>{a.clinicName}</td>
-
             </tr>
 
           ))}

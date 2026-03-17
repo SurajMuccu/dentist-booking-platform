@@ -20,23 +20,39 @@ function BookingForm({ dentist, onClose }) {
 
     e.preventDefault()
 
+    console.log("CONFIRM CLICKED") // debug
+
     const data = {
       ...formData,
       dentistName: dentist.name,
       clinicName: dentist.clinicName
     }
 
-    await fetch("http://localhost:5000/api/appointments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json"
-      },
-      body: JSON.stringify(data)
-    })
+    try {
 
-    alert("Appointment booked successfully")
+      const res = await fetch("https://dentist-booking-platform-wh8p.onrender.com/api/appointments", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      })
 
-    onClose()
+      const result = await res.json()
+
+      console.log("APPOINTMENT RESPONSE:", result)
+
+      if (res.ok) {
+        alert("Appointment booked successfully")
+        onClose()
+      } else {
+        alert(result.message || "Failed to book appointment")
+      }
+
+    } catch (error) {
+      console.log("ERROR:", error)
+      alert("Server error")
+    }
 
   }
 
@@ -111,11 +127,9 @@ function BookingForm({ dentist, onClose }) {
               borderRadius: "5px"
             }}
           >
-
             <option value="">Select Gender</option>
             <option value="Male">Male</option>
             <option value="Female">Female</option>
-
           </select>
 
           <input
